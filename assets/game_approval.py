@@ -5,11 +5,10 @@ def game():
     monsterHealth = Btoi(Txn.application_args[0])
     handle_creation = Seq([
         Assert(monsterHealth >= Int(5))
-        App.globalPut(Bytes("MonsterName"), Bytes("Scary Monster")),
         # 5 pt of health to start
-        App.globalPut(Bytes("HitPoints"), Btoi(Bytes("5"))),
+        App.globalPut(Bytes("HitPoints"), monsterHealth),
         # initialize global state of the highest damage dealt to 0
-        App.globalPut(Bytes("HighestDamageDealt"), Btoi(Bytes("0"))),
+        App.globalPut(Bytes("HighestDamageDealt"), Int(0)),
         Return(Int(1))
     ])
         
