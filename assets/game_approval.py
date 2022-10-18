@@ -27,6 +27,20 @@ def game():
         Return(Int(1))
     )
 
+    amountToSend = Btoi(Txn.application_args[1])
+    send_algos = Seq([
+        Assert(Txn.sender() == Global.creator_address()),
+        Assert(amountToSend <= Int(1000000)),
+        InnerTxnBuilder.Begin(),
+        InnerTxnBuilder.SetFields({
+            TxnField.type_enum: TxnType.Payment,
+            TxnField.receiver: Txn.accounts[1],
+            TxnField.amount: amountToSend,
+        }),
+        InnerTxnBuilder.Submit(),
+        Return(Int(1))
+    ])
+
     handle_noop = Cond(
     #  the contract will use the local state value to determine if this player did the most damage to the monster    
             [Txn.application_args[0] == Bytes("Attack"), attack],
