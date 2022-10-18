@@ -2,7 +2,9 @@ from pyteal import *
 
 def game():
     # Write your code here
+    monsterHealth = Btoi(Txn.application_args[0])
     handle_creation = Seq([
+        Assert(monsterHealth >= Int(5))
         App.globalPut(Bytes("MonsterName"), Bytes("Scary Monster")),
         # 5 pt of health to start
         App.globalPut(Bytes("HitPoints"), Btoi(Bytes("5"))),
