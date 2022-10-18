@@ -4,11 +4,11 @@ def game():
     # Write your code here
     monsterHealth = Btoi(Txn.application_args[0])
     handle_creation = Seq([
-        Assert(monsterHealth >= Int(5))
+        Assert(monsterHealth >= Int(5)),
         # 5 pt of health to start
-        App.globalPut(Bytes("HitPoints"), monsterHealth),
+        App.globalPut(Bytes("Health"), monsterHealth),
         # initialize global state of the highest damage dealt to 0
-        App.globalPut(Bytes("HighestDamageDealt"), Int(0)),
+        App.globalPut(Bytes("MaxDamage"), Int(0)),
         Return(Int(1))
     ])
         
@@ -16,7 +16,7 @@ def game():
         # should prevent player from making multiple opt in transactions
         Assert(App.optedIn(Txn.sender(),Txn.application_id())),
         # initialize local state of damage done to the monster to 0
-        App.localPut(Txn.sender(), Bytes("DamageDone"), Btoi(Bytes("0"))),
+        App.localPut(Txn.sender(), Bytes("Damage"), Int(0)),
         Return(Int(1))
     ])
 
@@ -42,10 +42,13 @@ def game():
         Return(Int(1))
     ])
 
-    handle_noop = Cond(
+    handle_noop = Seq(
+        Assert(Global.group_size() == Int(1)),
+        Cond(
     #  the contract will use the local state value to determine if this player did the most damage to the monster    
-            [Txn.application_args[0] == Bytes("Attack"), attack],
-            [Txn.application_args[0] == Bytes("SendAlgos"), send_algos],
+            [Txn.application_args[0] == Bytes("Attack"), attack_monster],
+            [Txn.application_args[0] == Bytes("Reward"), reward_player]
+        )
     )
 
     handle_closeout = Return(Int(1))
